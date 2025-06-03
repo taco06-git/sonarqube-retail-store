@@ -1,4 +1,4 @@
-PROJ- without maven or pom.xml support , scanned just raw files , not even built the project
+PROJ- without maven or pom.xml or sonarqube.properties file support , scanned just raw files , not even built the project
 
 SOMETIMES SONARSCANNER UNDER TOOLS Dont get install and you have to force to install it 
 -----------------------------------------------------------------------------------------
