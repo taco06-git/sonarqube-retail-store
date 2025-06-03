@@ -1,0 +1,53 @@
+PROJ- without maven or pom.xml support , scanned just raw files , not even built the project
+
+SOMETIMES SONARSCANNER UNDER TOOLS Dont get install and you have to force to install it 
+-----------------------------------------------------------------------------------------
+FORCE SONAR SCANNER installation by a script 
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Trigger SonarScanner Download') {
+            steps {
+                script {
+                    def scannerHome = tool name: 'sonar-scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                    echo "SonarScanner will be installed at: ${scannerHome}"
+                    sh "ls -la ${scannerHome}/bin || echo 'Scanner not installed yet'"
+                }
+            }
+        }
+    }
+}
+
+inside the container : /var/jenkins_home/tools/hudson.plugins.sonar.SonarRunnerInstallation/sonar-scanner/bin
+---------------------------
+
+remember   def scannerHome = tool name: 'sonar-scanner  has to come under script block 
+pipeline {
+    agent any
+    environment {
+        GIT_REPO = 'https://github.com/taco06-git/sonarqube-retail-store.git'
+    }
+    stages {
+
+         stage('Clone Repository') {
+            steps {
+                git url: "${GIT_REPO}", branch: 'master'
+            }
+        }
+
+        stage('SonarQube Scan') {
+            steps {
+              // def scannerHome = tool 'SonarQube-Scanner';
+                withSonarQubeEnv('sonarserver') { // Name of your SonarQube server configured in Jenkins
+                   script {
+                    def scannerHome = tool name: 'sonar-scanner' // ,type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=java -Dsonar.sources=src/main/java  -Dsonar.tests=src/test/java"               
+                   }
+                
+                }
+           }
+        }
+    }
+}
